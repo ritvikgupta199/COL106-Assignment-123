@@ -26,11 +26,15 @@ public class A1DynamicMem extends DynamicMem {
     // (A1List.java).
 
     public int Allocate(int blockSize) {
-        if (blockSize == 0)
+        // Cannot allocate a block of size < 0
+        if (blockSize < 0)
             return -1;
+
         Dictionary v = freeBlk.Find(blockSize, false);
+        // If v is null then there is no more space left in the Free Memory Block
         if (v == null)
             return -1;
+        // If size of the block found is exactly equal to requested block size, then split is not required
         if (v.key == blockSize) {
             allocBlk.Insert(v.address, v.size, v.address);
             freeBlk.Delete(v);
@@ -44,8 +48,11 @@ public class A1DynamicMem extends DynamicMem {
 
     public int Free(int startAddr) {
         Dictionary v = allocBlk.Find(startAddr, true);
+
+        // If v is null then there is no such block with the given address
         if (v == null)
             return -1;
+        
         freeBlk.Insert(v.address, v.size, v.size);
         allocBlk.Delete(v);
         return 0;
