@@ -91,6 +91,26 @@ public class A1List extends List {
     }
 
     public boolean sanity() {
+        A1List v = this.getFirst();
+        if (!(v.prev == null && v.key == -1 && v.address == -1 && v.size == -1))
+            return false;
+        v = v.next;
+        while (v.next != null) {
+            if (v.next.prev != v || v.prev.next != v)
+                return false;
+            v = v.next;
+        }
+        if (!(v.next == null && v.key == -1 && v.address == -1 && v.size == -1))
+            return false;
+        A1List p1 = this.getFirst();
+        A1List p2 = this.getFirst();
+        while (p1 != null && p2 != null && p2.next != null) {
+            p1 = p1.next;
+            p2 = p2.next.next;
+            if (p1 == p2) {
+                return false;
+            }
+        }
         return true;
     }
 
