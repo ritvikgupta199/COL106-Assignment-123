@@ -88,6 +88,7 @@ public class A1List extends List {
         return v;
     }
 
+    // Function to get Head Pointer for the DLL
     private A1List getHead(){
         A1List v = this;
         // Iterate to the head node of the list
