@@ -44,7 +44,7 @@ public class A1List extends List {
         A1List v = this.getHead();
         // Finding the node with match in the DLL
         while (v != null) {
-            if (v.key == d.key && v.address == d.address && v.size == d.size) {
+            if (v.key == d.key && v.address == d.address && v.size == d.size && v.next != null && v.prev != null) {
                 break;
             }
             v = v.next;
@@ -52,9 +52,6 @@ public class A1List extends List {
         if (v == null)
             return false;
         else {
-            // Tail node cannot be deleted
-            if (v.next == null)
-                return false;
             // Removing the node found
             v.next.prev = v.prev;
             v.prev.next = v.next;
@@ -66,14 +63,10 @@ public class A1List extends List {
         A1List v = this.getHead();
         // Finding the node with match in the DLL
         while (v != null) {
-            if ((exact && v.key == k) || (!exact && v.key >= k)) {
+            if (((exact && v.key == k) || (!exact && v.key >= k)) && v.next != null && v.prev != null) {
                 break;
             }
             v = v.next;
-        }
-        // Cannot return tail node
-        if (v != null && v.next == null) {
-            return null;
         }
         return v;
     }
