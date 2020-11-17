@@ -21,6 +21,10 @@ public class A1List extends List {
     }
 
     public A1List Insert(int address, int size, int key) {
+        // Insert cannot be called on the tail node
+        if (this.next == null) {
+            return null;
+        }
         // Inserting a new node after the current node in the DLL
         // Creating a new node
         A1List node = new A1List(address, size, key);
@@ -37,28 +41,20 @@ public class A1List extends List {
     }
 
     public boolean Delete(Dictionary d) {
-        A1List v = this;
-        // Finding the node with match in the forward direction
+        A1List v = this.getHead();
+        // Finding the node with match in the DLL
         while (v != null) {
             if (v.key == d.key && v.address == d.address && v.size == d.size) {
                 break;
             }
             v = v.next;
         }
-        // If the node is not found, then find the match in the backward direction
-        if (v == null) {
-            v = this;
-            while (v != null) {
-                if (v.key == d.key && v.address == d.address && v.size == d.size) {
-                    break;
-                }
-                v = v.prev;
-            }
-        }
-
         if (v == null)
             return false;
         else {
+            // Tail node cannot be deleted
+            if (v.next == null)
+                return false;
             // Removing the node found
             v.next.prev = v.prev;
             v.prev.next = v.next;
@@ -67,29 +63,23 @@ public class A1List extends List {
     }
 
     public A1List Find(int k, boolean exact) {
-        A1List v = this;
-        // Finding the node with match in the forward direction
+        A1List v = this.getHead();
+        // Finding the node with match in the DLL
         while (v != null) {
             if ((exact && v.key == k) || (!exact && v.key >= k)) {
                 break;
             }
             v = v.next;
         }
-        // If the node is not found, then find the match in the backward direction
-        if (v == null) {
-            v = this;
-            while (v != null) {
-                if ((exact && v.key == k) || (!exact && v.key >= k)) {
-                    break;
-                }
-                v = v.prev;
-            }
+        // Cannot return tail node
+        if (v != null && v.next == null) {
+            return null;
         }
         return v;
     }
 
     // Function to get Head Pointer for the DLL
-    private A1List getHead(){
+    private A1List getHead() {
         A1List v = this;
         // Iterate to the head node of the list
         while (v.prev != null) {
