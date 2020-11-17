@@ -88,7 +88,7 @@ public class A1List extends List {
         return v;
     }
 
-    public A1List getFirst() {
+    private A1List getHead(){
         A1List v = this;
         // Iterate to the head node of the list
         while (v.prev != null) {
@@ -97,12 +97,22 @@ public class A1List extends List {
         return v;
     }
 
+    public A1List getFirst() {
+        A1List v = this;
+        // Iterate to the head node of the list
+        while (v.prev != null) {
+            v = v.prev;
+        }
+        // Return null if the next node is tail node else return next node
+        return v.next.next == null ? null : v.next;
+    }
+
     public A1List getNext() {
         return this.next;
     }
 
     public boolean sanity() {
-        A1List v = this.getFirst();
+        A1List v = this.getHead();
         // Check if Head node has all values as -1 and prev pointer as null
         if (!(v.prev == null && v.key == -1 && v.address == -1 && v.size == -1))
             return false;
@@ -118,10 +128,10 @@ public class A1List extends List {
         // Check if Tail node has all values as -1 and next pointer as null
         if (!(v.next == null && v.key == -1 && v.address == -1 && v.size == -1))
             return false;
-        
+
         // Checking if the list gets circular using two-pointer method
-        A1List p1 = this.getFirst();
-        A1List p2 = this.getFirst();
+        A1List p1 = this.getHead();
+        A1List p2 = this.getHead();
         while (p1 != null && p2 != null && p2.next != null) {
             p1 = p1.next;
             p2 = p2.next.next;
