@@ -41,6 +41,8 @@ public class A1List extends List {
     }
 
     public boolean Delete(Dictionary d) {
+        if (d == null)
+            return false;
         A1List v = this.getHead();
         // Finding the node with match in the DLL
         while (v != null) {
