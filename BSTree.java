@@ -3,54 +3,203 @@
 
 public class BSTree extends Tree {
 
-    private BSTree left, right;     // Children.
-    private BSTree parent;          // Parent pointer.
-        
-    public BSTree(){  
+    private BSTree left, right; // Children.
+    private BSTree parent; // Parent pointer.
+
+    public BSTree() {
         super();
         // This acts as a sentinel root node
         // How to identify a sentinel node: A node with parent == null is SENTINEL NODE
         // The actual tree starts from one of the child of the sentinel node!.
-        // CONVENTION: Assume right child of the sentinel node holds the actual root! and left child will always be null.
-    }    
-
-    public BSTree(int address, int size, int key){
-        super(address, size, key); 
+        // CONVENTION: Assume right child of the sentinel node holds the actual root!
+        // and left child will always be null.
     }
 
-    public BSTree Insert(int address, int size, int key) 
-    { 
+    public BSTree(int address, int size, int key) {
+        super(address, size, key);
+    }
+
+    private BSTree getSentinel() {
+        BSTree v = this;
+        while (v.parent != null) {
+            v = v.parent;
+        }
+        return v;
+    }
+
+    private int compare(BSTree a, BSTree b) {
+        if (a.key < b.key) {
+            return -1;
+        } else if (a.key == b.key) {
+            if (a.address < b.address) {
+                return -1;
+            } else if (a.address == b.address) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            return 1;
+        }
+    }
+
+    private int compare(BSTree a, Dictionary d) {
+        if (a.key < d.key) {
+            return -1;
+        } else if (a.key == d.key) {
+            if (a.address < d.address) {
+                return -1;
+            } else if (a.address == d.address) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            return 1;
+        }
+    }
+
+    private BSTree search(BSTree root, Dictionary d) {
+        int comp = compare(root, d);
+        if (comp == 0) {
+            return root;
+        } else if (comp < 0) {
+            return root.left == null ? null : search(root.left, d);
+        } else {
+            return root.right == null ? null : search(root.right, d);
+        }
+    }
+
+    private void insertNode(BSTree root, BSTree node) {
+        if (compare(root, node) < 0) {
+            if (root.left == null) {
+                node.parent = root;
+                root.left = node;
+            } else {
+                insertNode(root.left, node);
+            }
+
+        } else if (compare(root, node) > 0) {
+            if (root.right == null) {
+                node.parent = root;
+                root.right = node;
+            } else {
+                insertNode(root.right, node);
+            }
+        }
+    }
+
+    public BSTree Insert(int address, int size, int key) {
+        BSTree v = getSentinel();
+        if (v.right == null) {
+            BSTree node = new BSTree(address, size, key);
+            node.parent = v;
+            v.right = node;
+            return node;
+        } else {
+            BSTree node = new BSTree(address, size, key);
+            insertNode(v.right, node);
+            return node;
+        }
+    }
+
+    public boolean Delete(Dictionary e) {
+        BSTree v = getSentinel();
+        if (v.right == null)
+            return false;
+        else {
+            v = v.right;
+            BSTree node = search(v, e);
+            if (node == null)
+                return false;
+            if (node.left == null && node.right == null) {
+                BSTree par = node.parent;
+                if (par.left == node) {
+                    par.left = null;
+                } else {
+                    par.right = null;
+                }
+            } else if (node.left == null && node.right != null) {
+                BSTree par = node.parent;
+                if (par.left == node) {
+                    par.left = node.right;
+                    node.right.parent = par;
+                } else {
+                    par.right = node.right;
+                    node.right.parent = par;
+                }
+            } else if (node.left != null && node.right == null) {
+                BSTree par = node.parent;
+                if (par.left == node) {
+                    par.left = node.left;
+                    node.left.parent = par;
+                } else {
+                    par.right = node.left;
+                    node.left.parent = par;
+                }
+            } else {
+                BSTree succ = node.getNext();
+                node.address = succ.address;
+                node.key = succ.address;
+                node.size = succ.size;
+
+                if (succ.right == null) {
+                    BSTree par = succ.parent;
+                    if (par.left == node) {
+                        par.left = null;
+                    } else {
+                        par.right = null;
+                    }
+                } else {
+                    BSTree par = succ.parent;
+                    if (par.left == node) {
+                        par.left = succ.right;
+                        succ.right.parent = par;
+                    } else {
+                        par.right = succ.right;
+                        succ.right.parent = par;
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    public BSTree Find(int key, boolean exact) {
         return null;
     }
 
-    public boolean Delete(Dictionary e)
-    { 
-        return false;
-    }
-        
-    public BSTree Find(int key, boolean exact)
-    { 
-        return null;
-    }
-
-    public BSTree getFirst()
-    { 
-        return null;
+    public BSTree getFirst() {
+        BSTree v = getSentinel();
+        if (v.right == null)
+            return null;
+        else {
+            v = v.right;
+            while (v.left != null) {
+                v = v.left;
+            }
+            return v;
+        }
     }
 
-    public BSTree getNext()
-    { 
-        return null;
+    public BSTree getNext() {
+        if (this.right != null) {
+            BSTree v = this.right;
+            while (v.left != null) {
+                v = v.left;
+            }
+            return v;
+        } else {
+            BSTree v = this;
+            while (v.parent.parent != null && v.parent.left != v) {
+                v = v.parent;
+            }
+            return v.parent.parent == null ? null : v.parent;
+        }
     }
 
-    public boolean sanity()
-    { 
+    public boolean sanity() {
         return false;
     }
 
 }
-
-
- 
-
-
