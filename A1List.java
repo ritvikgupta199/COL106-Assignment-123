@@ -97,17 +97,37 @@ public class A1List extends List {
         return this.next;
     }
 
-    public boolean sanity() {
-        // Checking if the list gets circular using two-pointer method
-        A1List p1 = this.getHead();
-        A1List p2 = this.getHead();
-        while (p1 != null && p2 != null && p2.next != null) {
-            p1 = p1.next;
-            p2 = p2.next.next;
-            // If there is a match then there exists a loop in the list
-            if (p1 == p2) {
-                return false;
+    // Returns true if there is a cycle in the given direction
+    private boolean checkCycle(boolean fwd) {
+        A1List p1 = this;
+        A1List p2 = this;
+        if (fwd) {
+            while (p1 != null && p2 != null && p2.next != null) {
+                p1 = p1.next;
+                p2 = p2.next.next;
+                // If there is a match then there exists a loop in the list
+                if (p1 == p2) {
+                    return true;
+                }
             }
+        } else {
+            while (p1 != null && p2 != null && p2.prev != null) {
+                p1 = p1.prev;
+                p2 = p2.prev.prev;
+                // If there is a match then there exists a loop in the list
+                if (p1 == p2) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean sanity() {
+        // Checking if the list gets circular using two-pointer method in both
+        // directions
+        if (this.checkCycle(true) || this.checkCycle(false)) {
+            return false;
         }
 
         A1List v = this.getHead();
