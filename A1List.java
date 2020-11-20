@@ -140,7 +140,7 @@ public class A1List extends List {
 
         A1List v = this.getHead();
         // Check if Head node has all values as -1 and prev pointer as null
-        if (!(v.prev == null && v.key == -1 && v.address == -1 && v.size == -1))
+        if (!(v.prev == null && v.key == -1 && v.address == -1 && v.size == -1 && v.next != null))
             return false;
         v = v.next;
 
