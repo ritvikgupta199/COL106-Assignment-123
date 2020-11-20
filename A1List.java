@@ -57,6 +57,10 @@ public class A1List extends List {
             // Removing the node found
             v.next.prev = v.prev;
             v.prev.next = v.next;
+
+            // Set next and prev pointers to null
+            v.next = null;
+            v.prev = null;
             return true;
         }
     }
@@ -94,7 +98,11 @@ public class A1List extends List {
     }
 
     public A1List getNext() {
-        return this.next;
+        // If the current node is tail node
+        if (this.next == null) {
+            return null;
+        }
+        return this.next.next == null ? null : this.next;
     }
 
     // Returns true if there is a cycle in the given direction
