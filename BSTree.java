@@ -109,6 +109,20 @@ public class BSTree extends Tree {
         }
     }
 
+    private BSTree searchGreater(BSTree root, int key, int address) {
+        int comp = root.compare(key, address);
+        if (root.left == null && root.right == null && comp > 0) {
+            return null;
+        } else if (comp <= 0 && (root.left == null || root.left.compare(key, address) > 0)) {
+            return root;
+        } else if (comp <= 0) {
+            return searchGreater(root.left, key, address);
+
+        } else {
+            return searchGreater(root.right, key, address);
+        }
+    }
+
     public BSTree Insert(int address, int size, int key) {
         BSTree v = getSentinel();
         if (v.right == null) {
@@ -186,7 +200,16 @@ public class BSTree extends Tree {
     }
 
     public BSTree Find(int key, boolean exact) {
-        return null;
+        BSTree v = getSentinel();
+        if (v.right == null) {
+            return null;
+        } else {
+            BSTree node = searchGreater(v.right, key, 0);
+            if (exact && node != null) {
+                return key == node.key ? node : null;
+            }
+            return node;
+        }
     }
 
     public BSTree getFirst() {
