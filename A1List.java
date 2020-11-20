@@ -98,6 +98,18 @@ public class A1List extends List {
     }
 
     public boolean sanity() {
+        // Checking if the list gets circular using two-pointer method
+        A1List p1 = this.getHead();
+        A1List p2 = this.getHead();
+        while (p1 != null && p2 != null && p2.next != null) {
+            p1 = p1.next;
+            p2 = p2.next.next;
+            // If there is a match then there exists a loop in the list
+            if (p1 == p2) {
+                return false;
+            }
+        }
+
         A1List v = this.getHead();
         // Check if Head node has all values as -1 and prev pointer as null
         if (!(v.prev == null && v.key == -1 && v.address == -1 && v.size == -1))
@@ -115,17 +127,6 @@ public class A1List extends List {
         if (!(v.next == null && v.key == -1 && v.address == -1 && v.size == -1))
             return false;
 
-        // Checking if the list gets circular using two-pointer method
-        A1List p1 = this.getHead();
-        A1List p2 = this.getHead();
-        while (p1 != null && p2 != null && p2.next != null) {
-            p1 = p1.next;
-            p2 = p2.next.next;
-            // If there is a match then there exists a loop in the list
-            if (p1 == p2) {
-                return false;
-            }
-        }
         return true;
     }
 
