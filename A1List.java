@@ -132,6 +132,10 @@ public class A1List extends List {
     }
 
     public boolean sanity() {
+        // If the node is a single isolated element
+        if (this.next == null && this.prev == null)
+            return false;
+
         // Checking if the list gets circular using two-pointer method in both
         // directions
         if (this.checkCycle(true) || this.checkCycle(false)) {
