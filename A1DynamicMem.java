@@ -34,7 +34,13 @@ public class A1DynamicMem extends DynamicMem {
         // If v is null then there is no more space left in the Free Memory Block
         if (v == null)
             return -1;
-        // If size of the block found is exactly equal to requested block size, then split is not required
+
+        // Saving address as the node to which v points may change during BST Deletion
+        // It may be swapped with its successor
+        int address = v.address;
+
+        // If size of the block found is exactly equal to requested block size, then
+        // split is not required
         if (v.key == blockSize) {
             allocBlk.Insert(v.address, v.size, v.address);
             freeBlk.Delete(v);
@@ -43,7 +49,7 @@ public class A1DynamicMem extends DynamicMem {
             freeBlk.Insert(v.address + blockSize, v.size - blockSize, v.size - blockSize);
             freeBlk.Delete(v);
         }
-        return v.address;
+        return address;
     }
 
     public int Free(int startAddr) {
@@ -52,7 +58,7 @@ public class A1DynamicMem extends DynamicMem {
         // If v is null then there is no such block with the given address
         if (v == null)
             return -1;
-        
+
         freeBlk.Insert(v.address, v.size, v.size);
         allocBlk.Delete(v);
         return 0;
