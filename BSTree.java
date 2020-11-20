@@ -27,40 +27,59 @@ public class BSTree extends Tree {
         return v;
     }
 
-    private int compare(BSTree a, BSTree b) {
-        if (a.key < b.key) {
-            return -1;
-        } else if (a.key == b.key) {
-            if (a.address < b.address) {
-                return -1;
-            } else if (a.address == b.address) {
+    // Is less than zero if b is smaller
+    // is zero if b is same
+    // is greater than zero if b is larger
+    private int compare(BSTree b) {
+        if (this.key < b.key) {
+            return 1;
+        } else if (this.key == b.key) {
+            if (this.address < b.address) {
+                return 1;
+            } else if (this.address == b.address) {
                 return 0;
             } else {
-                return 1;
+                return -1;
             }
         } else {
-            return 1;
+            return -1;
         }
     }
 
-    private int compare(BSTree a, Dictionary d) {
-        if (a.key < d.key) {
-            return -1;
-        } else if (a.key == d.key) {
-            if (a.address < d.address) {
-                return -1;
-            } else if (a.address == d.address) {
+    private int compare(Dictionary d) {
+        if (this.key < d.key) {
+            return 1;
+        } else if (this.key == d.key) {
+            if (this.address < d.address) {
+                return 1;
+            } else if (this.address == d.address) {
                 return 0;
             } else {
-                return 1;
+                return -1;
             }
         } else {
+            return -1;
+        }
+    }
+
+    private int compare(int key, int address) {
+        if (this.key < key) {
             return 1;
+        } else if (this.key == key) {
+            if (this.address < address) {
+                return 1;
+            } else if (this.address == address) {
+                return 0;
+            } else {
+                return -1;
+            }
+        } else {
+            return -1;
         }
     }
 
     private BSTree search(BSTree root, Dictionary d) {
-        int comp = compare(root, d);
+        int comp = root.compare(d);
         if (comp == 0) {
             return root;
         } else if (comp < 0) {
@@ -71,7 +90,8 @@ public class BSTree extends Tree {
     }
 
     private void insertNode(BSTree root, BSTree node) {
-        if (compare(root, node) < 0) {
+        int comp = root.compare(node);
+        if (comp < 0) {
             if (root.left == null) {
                 node.parent = root;
                 root.left = node;
@@ -79,7 +99,7 @@ public class BSTree extends Tree {
                 insertNode(root.left, node);
             }
 
-        } else if (compare(root, node) > 0) {
+        } else if (comp > 0) {
             if (root.right == null) {
                 node.parent = root;
                 root.right = node;
