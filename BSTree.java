@@ -119,7 +119,7 @@ public class BSTree extends Tree {
             return searchGreater(root.left, key, address);
 
         } else {
-            return searchGreater(root.right, key, address);
+            return root.right == null ? null : searchGreater(root.right, key, address);
         }
     }
 

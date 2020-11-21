@@ -36,7 +36,7 @@ public class A1DynamicMem extends DynamicMem {
             return -1;
 
         // Saving address as the node to which v points may change during BST Deletion
-        // It may be swapped with its successor
+        // Its data may be swapped with its successor
         int address = v.address;
 
         // If size of the block found is exactly equal to requested block size, then
