@@ -111,16 +111,18 @@ public class BSTree extends Tree {
 
     private BSTree searchGreater(BSTree root, int key, int address) {
         int comp = root.compare(key, address);
-        if (root.left == null && root.right == null && comp > 0) {
-            return null;
-        } else if (comp <= 0 && (root.left == null || root.left.compare(key, address) > 0)) {
-            return root;
-        } else if (comp <= 0) {
-            return searchGreater(root.left, key, address);
+        return root;
+        // Code needs to be corrected
+        // if (root.left == null && root.right == null && comp > 0) {
+        //     return null;
+        // } else if (comp <= 0 && (root.left == null || root.left.compare(key, address) > 0)) {
+        //     return root;
+        // } else if (comp <= 0) {
+        //     return searchGreater(root.left, key, address);
 
-        } else {
-            return root.right == null ? null : searchGreater(root.right, key, address);
-        }
+        // } else {
+        //     return root.right == null ? null : searchGreater(root.right, key, address);
+        // }
     }
 
     public BSTree Insert(int address, int size, int key) {
