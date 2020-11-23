@@ -1,5 +1,3 @@
-import apple.laf.JRSUIConstants.Size;
-
 // Class: A2DynamicMem
 // Implements Degragment in A2. No other changes should be needed for other functions.
 

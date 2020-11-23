@@ -203,7 +203,7 @@ public class BSTree extends Tree {
         if (v.right == null) {
             return null;
         } else {
-            BSTree node = searchGreater(v.right, key, 0);
+            BSTree node = searchGreater(v.right, null, key, 0);
             if (exact && node != null) {
                 return key == node.key ? node : null;
             }
