@@ -173,7 +173,7 @@ public class BSTree extends Tree {
             } else {
                 BSTree succ = node.getNext();
                 node.address = succ.address;
-                node.key = succ.address;
+                node.key = succ.key;
                 node.size = succ.size;
 
                 if (succ.right == null) {
