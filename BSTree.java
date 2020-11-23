@@ -178,14 +178,14 @@ public class BSTree extends Tree {
 
                 if (succ.right == null) {
                     BSTree par = succ.parent;
-                    if (par.left == node) {
+                    if (par.left == succ) {
                         par.left = null;
                     } else {
                         par.right = null;
                     }
                 } else {
                     BSTree par = succ.parent;
-                    if (par.left == node) {
+                    if (par.left == succ) {
                         par.left = succ.right;
                         succ.right.parent = par;
                     } else {
@@ -225,6 +225,9 @@ public class BSTree extends Tree {
     }
 
     public BSTree getNext() {
+        if (this.parent == null && this.right == null) {
+            return null;
+        }
         if (this.right != null) {
             BSTree v = this.right;
             while (v.left != null) {
