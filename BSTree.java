@@ -1,3 +1,4 @@
+import java.text.NumberFormat.Style;
 import java.util.*;
 
 // Class: Implementation of BST in A2
@@ -343,6 +344,8 @@ public class BSTree extends Tree {
     }
 
     // This function recursively checks whether node.child.parent==node
+    // Returns true is the property is satisfied and
+    // false if the property is not satisfied
     private boolean checkChildParent() {
         if (this.left == null && this.right == null) {
             return true;
@@ -356,26 +359,20 @@ public class BSTree extends Tree {
         }
     }
 
-    private boolean checkCycle(BSTree prev, HashSet<Integer> set) {
-        if (set.contains(this.address)) {
+    private boolean checkCycle(BSTree prev, HashSet<BSTree> set) {
+        if (set.contains(this)) {
             return false;
         }
-        set.add(this.address);
+        set.add(this);
 
         boolean check = true;
-        if (this.left != null) {
-            if (prev != null && this.left.address != prev.address)
-                check = check && this.left.checkCycle(this, set);
+        if (this.left != null && (prev == null || this.left != prev)) {
             check = check && this.left.checkCycle(this, set);
         }
-        if (this.right != null) {
-            if (prev != null && this.right.address != prev.address)
-                check = check && this.right.checkCycle(this, set);
+        if (this.right != null && (prev == null || this.right != prev)) {
             check = check && this.right.checkCycle(this, set);
         }
-        if (this.parent != null) {
-            if (prev != null && this.parent.address != prev.address)
-                check = check && this.parent.checkCycle(this, set);
+        if (this.parent != null && (prev == null || this.parent != prev)) {
             check = check && this.parent.checkCycle(this, set);
         }
         return check;
@@ -383,7 +380,7 @@ public class BSTree extends Tree {
 
     public boolean sanity() {
         // Check for cycles in the tree
-        HashSet<Integer> set = new HashSet<>();
+        HashSet<BSTree> set = new HashSet<>();
         if (!this.checkCycle(null, set)) {
             return false;
         }

@@ -19,10 +19,6 @@ public class Driver {
         bst.Insert(22, 30, 22);
         bst.Insert(26, 30, 26);
         bst.Insert(30, 31, 30);
-
-        BSTree test = bst.Find(45, false);
-        System.out.println("Hello");
-        System.out.println(test.key);
-        System.out.println(test.size);
+        System.out.println(bst.sanity() ? "True" : "False");
     }
 }
