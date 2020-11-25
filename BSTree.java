@@ -1,3 +1,5 @@
+import java.util.*;
+
 // Class: Implementation of BST in A2
 // Implement the following functions according to the specifications provided in Tree.java
 
@@ -21,7 +23,8 @@ public class BSTree extends Tree {
 
     private BSTree getSentinel() {
         BSTree v = this;
-        // Move up the tree until v.parent != null, i.e. until v is not the sentinel node
+        // Move up the tree until v.parent != null, i.e. until v is not the sentinel
+        // node
         while (v.parent != null) {
             v = v.parent;
         }
@@ -29,7 +32,8 @@ public class BSTree extends Tree {
     }
 
     // The compare function returns
-    // 1 when the node being compared is greater than the node on which it is called, i.e. this
+    // 1 when the node being compared is greater than the node on which it is
+    // called, i.e. this
     // 0 when the node being compared is exactly equal to the node
     // -1 when the node being compared is smaller than the node
     private int compare(BSTree b) {
@@ -129,6 +133,9 @@ public class BSTree extends Tree {
                 // Else recursively insert in the right subtree
                 insertNode(root.right, node);
             }
+        } else {
+            // If the node is already present then we have to return null
+            node = null;
         }
     }
 
@@ -349,7 +356,37 @@ public class BSTree extends Tree {
         }
     }
 
+    private boolean checkCycle(BSTree prev, HashSet<Integer> set) {
+        if (set.contains(this.address)) {
+            return false;
+        }
+        set.add(this.address);
+
+        boolean check = true;
+        if (this.left != null) {
+            if (prev != null && this.left.address != prev.address)
+                check = check && this.left.checkCycle(this, set);
+            check = check && this.left.checkCycle(this, set);
+        }
+        if (this.right != null) {
+            if (prev != null && this.right.address != prev.address)
+                check = check && this.right.checkCycle(this, set);
+            check = check && this.right.checkCycle(this, set);
+        }
+        if (this.parent != null) {
+            if (prev != null && this.parent.address != prev.address)
+                check = check && this.parent.checkCycle(this, set);
+            check = check && this.parent.checkCycle(this, set);
+        }
+        return check;
+    }
+
     public boolean sanity() {
+        // Check for cycles in the tree
+        HashSet<Integer> set = new HashSet<>();
+        if (!this.checkCycle(null, set)) {
+            return false;
+        }
 
         // Check that sentinel node has all values as -1
         // and its parent and left child is also null
