@@ -40,8 +40,13 @@ public class A2DynamicMem extends A1DynamicMem {
             Dictionary next = prev.getNext();
             while (next != null) {
                 if (prev.address + prev.size == next.address) {
-                    freeBlk.Delete(new BSTree(prev.address, prev.size, prev.size));
-                    freeBlk.Delete(new BSTree(next.address, next.size, next.size));
+                    if (this.type == 2) {
+                        freeBlk.Delete(new BSTree(prev.address, prev.size, prev.size));
+                        freeBlk.Delete(new BSTree(next.address, next.size, next.size));
+                    } else if (this.type == 3) {
+                        freeBlk.Delete(new AVLTree(prev.address, prev.size, prev.size));
+                        freeBlk.Delete(new AVLTree(next.address, next.size, next.size));
+                    }
                     next.address = prev.address;
                     next.size = next.size + prev.size;
                     freeBlk.Insert(next.address, next.size, next.size);
