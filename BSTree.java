@@ -1,4 +1,3 @@
-import java.text.NumberFormat.Style;
 import java.util.*;
 
 // Class: Implementation of BST in A2
@@ -359,23 +358,60 @@ public class BSTree extends Tree {
         }
     }
 
+    // This function checks for cycles in the tree using Depth First Search
+    // returns true if there are not cycles and
+    // returns false if there exists a cycle in the tree
     private boolean checkCycle(BSTree prev, HashSet<BSTree> set) {
+        // If the current node is already present in the set,
+        // it has already been visited
+        // Since in DFS, we never move along an edge more than once,
+        // there must be a cycle in the tree
         if (set.contains(this)) {
             return false;
         }
+
+        // Mark this node as visited by adding it to the set
         set.add(this);
 
         boolean check = true;
+
+        // If there is a left child and either prev is null
+        // or if the left child is different from prev,
+        // We visit the left node using DFS, checking for cycles
         if (this.left != null && (prev == null || this.left != prev)) {
             check = check && this.left.checkCycle(this, set);
         }
+        // If there is a right child and either prev is null
+        // or if the right child is different from prev,
+        // We visit the right node using DFS, checking for cycles
         if (this.right != null && (prev == null || this.right != prev)) {
             check = check && this.right.checkCycle(this, set);
         }
+        // If there is a right child and either prev is null
+        // or if the right child is different from prev,
+        // We visit the parent node using DFS, checking for cycles
         if (this.parent != null && (prev == null || this.parent != prev)) {
             check = check && this.parent.checkCycle(this, set);
         }
         return check;
+    }
+
+    // This function recursively checks for BST Search Property
+    // Returns true is the property is satisfied and
+    // false if the property is not satisfied
+    private boolean checkBSTProperty(BSTree node, int minKey, int minAddress, int maxKey, int maxAddress) {
+        // Property is vacuously true
+        if (node == null) {
+            return true;
+        }
+        // Return false if node does not satisy minimum and maximum constraints
+        if (!(node.compare(minKey, minAddress) < 0 && node.compare(maxKey, maxAddress) > 0))
+            return false;
+
+        // Recursively check BST Property for left and right subtree
+        return checkBSTProperty(node.left, minKey, minAddress, node.key, node.address)
+                && checkBSTProperty(node.right, node.key, node.address, maxKey, maxAddress);
+
     }
 
     public boolean sanity() {
@@ -389,6 +425,11 @@ public class BSTree extends Tree {
         // and its parent and left child is also null
         BSTree sent = this.getSentinel();
         if (!(sent.address == -1 && sent.size == -1 && sent.key == -1 && sent.left == null && sent.parent == null)) {
+            return false;
+        }
+
+        // Check BST Search Property for the tree
+        if (sent.right!=null && !checkBSTProperty(sent.right, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)) {
             return false;
         }
 
