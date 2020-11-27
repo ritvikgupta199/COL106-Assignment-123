@@ -7,7 +7,7 @@ public class AVLTree extends BSTree {
 
     private AVLTree left, right; // Children.
     private AVLTree parent; // Parent pointer.
-    private int height; // The height of the subtree
+    public int height; // The height of the subtree
 
     public AVLTree() {
         super();
@@ -175,6 +175,88 @@ public class AVLTree extends BSTree {
         }
     }
 
+    private int height(AVLTree node) {
+        return node == null ? 0 : node.height;
+    }
+
+    private void updateHeight() {
+        this.height = 1 + Math.max(height(this.left), height(this.right));
+    }
+
+    private void rotateL(AVLTree par, AVLTree child) {
+        par.right = child.left;
+        if (par.right != null)
+            par.right.parent = par;
+
+        child.parent = par.parent;
+        if (child.parent.left == par)
+            child.parent.left = child;
+        else
+            child.parent.right = child;
+
+        par.parent = child;
+        child.left = par;
+    }
+
+    private void rotateR(AVLTree child, AVLTree par) {
+        par.left = child.right;
+        if (par.right != null)
+            par.left.parent = par;
+
+        child.parent = par.parent;
+        if (par.parent.left == par)
+            child.parent.left = child;
+        else
+            child.parent.right = child;
+
+        par.parent = child;
+        child.right = par;
+    }
+
+    private void correctBalance() {
+        AVLTree par = this.parent;
+        AVLTree child = this;
+        while (par.parent != null) {
+            int bal = height(par.left) - height(par.right);
+            if (bal > 1) {
+                if (height(child.left) > height(child.right)) {
+                    rotateR(child, par);
+                    par.updateHeight();
+                    child.updateHeight();
+                    par = child;
+                } else {
+                    AVLTree grandchild = child.right;
+                    rotateL(child.right, child);
+                    rotateR(grandchild, par);
+                    child.updateHeight();
+                    par.updateHeight();
+                    grandchild.updateHeight();
+                    par = grandchild;
+                }
+            } else if (bal < -1) {
+                if (height(child.left) > height(child.right)) {
+                    AVLTree grandchild = child.left;
+                    rotateL(child.left, child);
+                    rotateR(grandchild, par);
+                    child.updateHeight();
+                    par.updateHeight();
+                    grandchild.updateHeight();
+                    par = grandchild;
+                } else {
+                    rotateR(child, par);
+                    par.updateHeight();
+                    child.updateHeight();
+                    par = child;
+                }
+            } else {
+                par.updateHeight();
+            }
+            child = par;
+            par = par.parent;
+        }
+
+    }
+
     public AVLTree Insert(int address, int size, int key) {
         AVLTree v = getSentinel();
         // If the right child of sentinel is null then the tree is empty
@@ -183,6 +265,7 @@ public class AVLTree extends BSTree {
             AVLTree node = new AVLTree(address, size, key);
             node.parent = v;
             v.right = node;
+            node.updateHeight();
             return node;
         } else {
             // If the tree is not empty
@@ -190,7 +273,8 @@ public class AVLTree extends BSTree {
             AVLTree node = new AVLTree(address, size, key);
             // Recursively insert the element from the root node
             insertNode(v.right, node);
-
+            node.updateHeight();
+            node.correctBalance();
             return node;
         }
     }
@@ -376,6 +460,8 @@ public class AVLTree extends BSTree {
         // Since in DFS, we never move along an edge more than once,
         // there must be a cycle in the tree
         if (set.contains(this)) {
+            System.out.println(this.key);
+            System.out.println(prev.key);
             return false;
         }
 
@@ -438,7 +524,8 @@ public class AVLTree extends BSTree {
         }
 
         // Check BST Search Property for the tree
-        if (sent.right!=null && !checkBSTProperty(sent.right, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)) {
+        if (sent.right != null && !checkBSTProperty(sent.right, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,
+                Integer.MAX_VALUE)) {
             return false;
         }
 
