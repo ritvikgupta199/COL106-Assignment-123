@@ -8,7 +8,13 @@ public class Driver {
             bst.Insert(1000, 1000, i);
         }
         System.out.println(bst.sanity() ? "True" : "False");
+        for (AVLTree i = bst.getFirst(); i != null; i = i.getNext()) {
+            System.out.println("Element:" + i.key+" Height:"+i.height);
+        }
 
+        bst.Delete(new AVLTree(1000,1000,4));
+
+        System.out.println(bst.sanity() ? "True" : "False");
         for (AVLTree i = bst.getFirst(); i != null; i = i.getNext()) {
             System.out.println("Element:" + i.key+" Height:"+i.height);
         }

@@ -183,7 +183,7 @@ public class AVLTree extends BSTree {
         this.height = 1 + Math.max(height(this.left), height(this.right));
     }
 
-    private void rotateL(AVLTree par, AVLTree child) {
+    private void rotateL(AVLTree child, AVLTree par) {
         par.right = child.left;
         if (par.right != null)
             par.right.parent = par;
@@ -200,7 +200,7 @@ public class AVLTree extends BSTree {
 
     private void rotateR(AVLTree child, AVLTree par) {
         par.left = child.right;
-        if (par.right != null)
+        if (par.left != null)
             par.left.parent = par;
 
         child.parent = par.parent;
@@ -213,7 +213,7 @@ public class AVLTree extends BSTree {
         child.right = par;
     }
 
-    private void correctBalance() {
+    private void correctInsertBalance() {
         AVLTree par = this.parent;
         AVLTree child = this;
         while (par.parent != null) {
@@ -236,14 +236,14 @@ public class AVLTree extends BSTree {
             } else if (bal < -1) {
                 if (height(child.left) > height(child.right)) {
                     AVLTree grandchild = child.left;
-                    rotateL(child.left, child);
-                    rotateR(grandchild, par);
+                    rotateR(child.left, child);
+                    rotateL(grandchild, par);
                     child.updateHeight();
                     par.updateHeight();
                     grandchild.updateHeight();
                     par = grandchild;
                 } else {
-                    rotateR(child, par);
+                    rotateL(child, par);
                     par.updateHeight();
                     child.updateHeight();
                     par = child;
@@ -274,8 +274,68 @@ public class AVLTree extends BSTree {
             // Recursively insert the element from the root node
             insertNode(v.right, node);
             node.updateHeight();
-            node.correctBalance();
+            node.correctInsertBalance();
             return node;
+        }
+    }
+
+    private AVLTree largerSubtree() {
+        if (height(this.left) > height(this.right)) {
+            return this.left;
+        } else {
+            return this.right;
+        }
+    }
+
+    private void correctDeleteBalance() {
+        AVLTree par = this;
+        par.updateHeight();
+        while (par.parent != null) {
+            int bal = height(par.left) - height(par.right);
+            if (bal > 1) {
+                AVLTree child = par.largerSubtree();
+                if (child != null) {
+                    AVLTree grandchild = child.largerSubtree();
+                    if (grandchild != null) {
+                        if (child.left == grandchild) {
+                            rotateR(child, par);
+                            par.updateHeight();
+                            child.updateHeight();
+                            par = child;
+                        } else {
+                            rotateL(grandchild, child);
+                            rotateR(grandchild, par);
+                            child.updateHeight();
+                            par.updateHeight();
+                            grandchild.updateHeight();
+                            par = grandchild;
+                        }
+                    }
+                }
+            } else if (bal < -1) {
+                AVLTree child = par.largerSubtree();
+                if (child != null) {
+                    AVLTree grandchild = child.largerSubtree();
+                    if (grandchild != null) {
+                        if (child.left == grandchild) {
+                            rotateR(grandchild, child);
+                            rotateL(grandchild, par);
+                            child.updateHeight();
+                            par.updateHeight();
+                            grandchild.updateHeight();
+                            par = grandchild;
+                        } else {
+                            rotateL(child, par);
+                            par.updateHeight();
+                            child.updateHeight();
+                            par = child;
+                        }
+                    }
+                }
+            } else {
+                par.updateHeight();
+            }
+            par=par.parent;
         }
     }
 
@@ -303,6 +363,7 @@ public class AVLTree extends BSTree {
                     // If the node is a right child
                     par.right = null;
                 }
+                par.correctDeleteBalance();
             } else if (node.left == null && node.right != null) {
                 // If the node only has a right child
                 AVLTree par = node.parent;
@@ -315,6 +376,7 @@ public class AVLTree extends BSTree {
                     par.right = node.right;
                     node.right.parent = par;
                 }
+                par.correctDeleteBalance();
             } else if (node.left != null && node.right == null) {
                 // If the node only has a left child
                 AVLTree par = node.parent;
@@ -327,6 +389,7 @@ public class AVLTree extends BSTree {
                     par.right = node.left;
                     node.left.parent = par;
                 }
+                par.correctDeleteBalance();
             } else {
                 // If the node has both right and left child, we then copy the successor data
                 // into node and delete the successor node
@@ -351,6 +414,7 @@ public class AVLTree extends BSTree {
                         // If the node is a right child
                         par.right = null;
                     }
+                    par.correctDeleteBalance();
                 } else {
                     // If the right child is not null, i.e. succ has only one child
                     AVLTree par = succ.parent;
@@ -363,6 +427,7 @@ public class AVLTree extends BSTree {
                         par.right = succ.right;
                         succ.right.parent = par;
                     }
+                    par.correctDeleteBalance();
                 }
             }
             return true;
@@ -513,6 +578,7 @@ public class AVLTree extends BSTree {
         // Check for cycles in the tree
         HashSet<AVLTree> set = new HashSet<>();
         if (!this.checkCycle(null, set)) {
+            System.out.println("x");
             return false;
         }
 
