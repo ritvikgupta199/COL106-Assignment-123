@@ -335,7 +335,7 @@ public class AVLTree extends BSTree {
             } else {
                 par.updateHeight();
             }
-            par=par.parent;
+            par = par.parent;
         }
     }
 
@@ -574,6 +574,19 @@ public class AVLTree extends BSTree {
 
     }
 
+    private boolean isBalanced() {
+        if (this.left == null && this.right == null) {
+            return true;
+        } else if (this.left != null && this.right == null) {
+            return Math.abs(height(this.left) - height(this.right)) <= 1 && this.left.isBalanced();
+        } else if (this.left == null && this.right != null) {
+            return Math.abs(height(this.left) - height(this.right)) <= 1 && this.right.isBalanced();
+        } else {
+            return Math.abs(height(this.left) - height(this.right)) <= 1 && this.left.isBalanced()
+                    && this.right.isBalanced();
+        }
+    }
+
     public boolean sanity() {
         // Check for cycles in the tree
         HashSet<AVLTree> set = new HashSet<>();
@@ -597,6 +610,10 @@ public class AVLTree extends BSTree {
 
         // Check that node.left.parent == node and node.right.parent == node
         if (!sent.checkChildParent())
+            return false;
+
+        // Check AVL Property for the tree, i.e. if the Tree is height balanced
+        if (sent.right != null && !sent.right.isBalanced())
             return false;
 
         return true;
