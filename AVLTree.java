@@ -7,7 +7,7 @@ public class AVLTree extends BSTree {
 
     private AVLTree left, right; // Children.
     private AVLTree parent; // Parent pointer.
-    public int height; // The height of the subtree
+    private int height; // The height of the subtree
 
     public AVLTree() {
         super();
