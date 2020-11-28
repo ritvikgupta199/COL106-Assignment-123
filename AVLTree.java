@@ -279,57 +279,45 @@ public class AVLTree extends BSTree {
         }
     }
 
-    private AVLTree largerSubtree() {
-        if (height(this.left) > height(this.right)) {
-            return this.left;
-        } else {
-            return this.right;
-        }
-    }
-
     private void correctDeleteBalance() {
         AVLTree par = this;
         par.updateHeight();
         while (par.parent != null) {
             int bal = height(par.left) - height(par.right);
             if (bal > 1) {
-                AVLTree child = par.largerSubtree();
+                AVLTree child = par.left;
                 if (child != null) {
-                    AVLTree grandchild = child.largerSubtree();
-                    if (grandchild != null) {
-                        if (child.left == grandchild) {
-                            rotateR(child, par);
-                            par.updateHeight();
-                            child.updateHeight();
-                            par = child;
-                        } else {
-                            rotateL(grandchild, child);
-                            rotateR(grandchild, par);
-                            child.updateHeight();
-                            par.updateHeight();
-                            grandchild.updateHeight();
-                            par = grandchild;
-                        }
+                    if (height(child.left) >= height(child.right)) {
+                        rotateR(child, par);
+                        par.updateHeight();
+                        child.updateHeight();
+                        par = child;
+                    } else {
+                        AVLTree grandchild = child.right;
+                        rotateL(grandchild, child);
+                        rotateR(grandchild, par);
+                        child.updateHeight();
+                        par.updateHeight();
+                        grandchild.updateHeight();
+                        par = grandchild;
                     }
                 }
             } else if (bal < -1) {
-                AVLTree child = par.largerSubtree();
+                AVLTree child = par.right;
                 if (child != null) {
-                    AVLTree grandchild = child.largerSubtree();
-                    if (grandchild != null) {
-                        if (child.left == grandchild) {
-                            rotateR(grandchild, child);
-                            rotateL(grandchild, par);
-                            child.updateHeight();
-                            par.updateHeight();
-                            grandchild.updateHeight();
-                            par = grandchild;
-                        } else {
-                            rotateL(child, par);
-                            par.updateHeight();
-                            child.updateHeight();
-                            par = child;
-                        }
+                    if (height(child.left) > height(child.right)) {
+                        AVLTree grandchild = child.left;
+                        rotateR(grandchild, child);
+                        rotateL(grandchild, par);
+                        child.updateHeight();
+                        par.updateHeight();
+                        grandchild.updateHeight();
+                        par = grandchild;
+                    } else {
+                        rotateL(child, par);
+                        par.updateHeight();
+                        child.updateHeight();
+                        par = child;
                     }
                 }
             } else {
