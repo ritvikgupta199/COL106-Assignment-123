@@ -175,58 +175,80 @@ public class AVLTree extends BSTree {
         }
     }
 
-    private int height(AVLTree node) {
+    // Returns the height of the node
+    private int getHeight(AVLTree node) {
+        // height is 0 if null
         return node == null ? 0 : node.height;
     }
 
+    // Updates the height of this node
     private void updateHeight() {
-        this.height = 1 + Math.max(height(this.left), height(this.right));
+        this.height = 1 + Math.max(getHeight(this.left), getHeight(this.right));
     }
 
+    // Left Rotates the nodes child and parent
     private void rotateL(AVLTree child, AVLTree par) {
+        // Setting pointers for new right node of parent
         par.right = child.left;
         if (par.right != null)
             par.right.parent = par;
 
+        // Setting pointers for new parent of child
         child.parent = par.parent;
         if (child.parent.left == par)
             child.parent.left = child;
         else
             child.parent.right = child;
 
+        // Setting pointers for making parent the right child of child
         par.parent = child;
         child.left = par;
     }
 
+    // Right Rotates the nodes child and parent
     private void rotateR(AVLTree child, AVLTree par) {
+        // Setting pointers for new left child of parent
         par.left = child.right;
         if (par.left != null)
             par.left.parent = par;
 
+        // Setting pointers for new parent of child
         child.parent = par.parent;
         if (par.parent.left == par)
             child.parent.left = child;
         else
             child.parent.right = child;
 
+        // Setting pointers for making parent the right child of child
         par.parent = child;
         child.right = par;
     }
 
+    // Checks the AVL Balancing Property after Insertion and
+    // Corrects it using suitable rotations
     private void correctInsertBalance() {
         AVLTree par = this.parent;
         AVLTree child = this;
+        // We move up the tree until par becomes the sentinel node
         while (par.parent != null) {
-            int bal = height(par.left) - height(par.right);
+            int bal = getHeight(par.left) - getHeight(par.right);
             if (bal > 1) {
-                if (height(child.left) > height(child.right)) {
+                // If the left height differs the right height by more than 1,
+                // the balance property is violated
+                // Also the left node is causing the imbalance
+                if (getHeight(child.left) > getHeight(child.right)) {
+                    // If the left child of the child has more height,
+                    // We require a Right Rotation on nodes child and par
                     rotateR(child, par);
                     par.updateHeight();
                     child.updateHeight();
                     par = child;
                 } else {
+                    // If the right child of the child has more height,
+                    // We first require a Left Rotation on nodes grandchild and child
+                    // followed by a Right Rotation on nodes grandchild and par
                     AVLTree grandchild = child.right;
-                    rotateL(child.right, child);
+                    rotateL(grandchild, child);
                     rotateR(grandchild, par);
                     child.updateHeight();
                     par.updateHeight();
@@ -234,21 +256,31 @@ public class AVLTree extends BSTree {
                     par = grandchild;
                 }
             } else if (bal < -1) {
-                if (height(child.left) > height(child.right)) {
+                // If the right height differs the left height by more than 1,
+                // the balance property is violated
+                // Also the right node is causing the imbalance
+                if (getHeight(child.left) > getHeight(child.right)) {
+                    // If the left child of the child has more height,
+                    // We first require a Right Rotation on nodes grandchild and child
+                    // followed by a Left Rotation on nodes grandchild and par
                     AVLTree grandchild = child.left;
-                    rotateR(child.left, child);
+                    rotateR(grandchild, child);
                     rotateL(grandchild, par);
                     child.updateHeight();
                     par.updateHeight();
                     grandchild.updateHeight();
                     par = grandchild;
                 } else {
+                    // If the right child of the child has more height,
+                    // We require a Left Rotation on nodes child and par
                     rotateL(child, par);
                     par.updateHeight();
                     child.updateHeight();
                     par = child;
                 }
             } else {
+                // If the balance is maintained, we just update the height of par node and
+                // continue up the tree
                 par.updateHeight();
             }
             child = par;
@@ -257,6 +289,7 @@ public class AVLTree extends BSTree {
 
     }
 
+    @Override
     public AVLTree Insert(int address, int size, int key) {
         AVLTree v = getSentinel();
         // If the right child of sentinel is null then the tree is empty
@@ -273,7 +306,9 @@ public class AVLTree extends BSTree {
             AVLTree node = new AVLTree(address, size, key);
             // Recursively insert the element from the root node
             insertNode(v.right, node);
+            // Update the height of this node
             node.updateHeight();
+            // Start correcting balance from this node
             node.correctInsertBalance();
             return node;
         }
@@ -282,17 +317,26 @@ public class AVLTree extends BSTree {
     private void correctDeleteBalance() {
         AVLTree par = this;
         par.updateHeight();
+        // We move up the tree until par becomes the sentinel node
         while (par.parent != null) {
-            int bal = height(par.left) - height(par.right);
+            int bal = getHeight(par.left) - getHeight(par.right);
             if (bal > 1) {
+                // If the left height differs the right height by more than 1,
+                // the balance property is violated
+                // Also the left node is causing the imbalance
                 AVLTree child = par.left;
                 if (child != null) {
-                    if (height(child.left) >= height(child.right)) {
+                    if (getHeight(child.left) >= getHeight(child.right)) {
+                        // If the left height is more than or equal to the right height,
+                        // We require a Right Rotation on nodes child and par
                         rotateR(child, par);
                         par.updateHeight();
                         child.updateHeight();
                         par = child;
                     } else {
+                        // If the right height is more than left height,
+                        // We first require a Left Rotation on nodes grandchild and child
+                        // followed by a Right Rotation on nodes grandchild and par
                         AVLTree grandchild = child.right;
                         rotateL(grandchild, child);
                         rotateR(grandchild, par);
@@ -303,9 +347,15 @@ public class AVLTree extends BSTree {
                     }
                 }
             } else if (bal < -1) {
+                // If the right height differs the left height by more than 1,
+                // the balance property is violated
+                // Also the right node is causing the imbalance
                 AVLTree child = par.right;
                 if (child != null) {
-                    if (height(child.left) > height(child.right)) {
+                    if (getHeight(child.left) > getHeight(child.right)) {
+                        // If the left height is more than left height,
+                        // We first require a Right Rotation on nodes grandchild and child
+                        // followed by a Left Rotation on nodes grandchild and par
                         AVLTree grandchild = child.left;
                         rotateR(grandchild, child);
                         rotateL(grandchild, par);
@@ -314,6 +364,8 @@ public class AVLTree extends BSTree {
                         grandchild.updateHeight();
                         par = grandchild;
                     } else {
+                        // If the right child of the child has more height,
+                        // We require a Left Rotation on nodes child and par
                         rotateL(child, par);
                         par.updateHeight();
                         child.updateHeight();
@@ -321,12 +373,15 @@ public class AVLTree extends BSTree {
                     }
                 }
             } else {
+                // If the balance is maintained, we just update the height of par node and
+                // continue up the tree
                 par.updateHeight();
             }
             par = par.parent;
         }
     }
 
+    @Override
     public boolean Delete(Dictionary e) {
         AVLTree v = getSentinel();
         // If the right child of sentinel is null then the tree is empty
@@ -351,6 +406,7 @@ public class AVLTree extends BSTree {
                     // If the node is a right child
                     par.right = null;
                 }
+                // Start correcting balance from this node
                 par.correctDeleteBalance();
             } else if (node.left == null && node.right != null) {
                 // If the node only has a right child
@@ -364,6 +420,7 @@ public class AVLTree extends BSTree {
                     par.right = node.right;
                     node.right.parent = par;
                 }
+                // Start correcting balance from this node
                 par.correctDeleteBalance();
             } else if (node.left != null && node.right == null) {
                 // If the node only has a left child
@@ -377,6 +434,7 @@ public class AVLTree extends BSTree {
                     par.right = node.left;
                     node.left.parent = par;
                 }
+                // Start correcting balance from this node
                 par.correctDeleteBalance();
             } else {
                 // If the node has both right and left child, we then copy the successor data
@@ -402,6 +460,7 @@ public class AVLTree extends BSTree {
                         // If the node is a right child
                         par.right = null;
                     }
+                    // Start correcting balance from this node
                     par.correctDeleteBalance();
                 } else {
                     // If the right child is not null, i.e. succ has only one child
@@ -415,6 +474,7 @@ public class AVLTree extends BSTree {
                         par.right = succ.right;
                         succ.right.parent = par;
                     }
+                    // Start correcting balance from this node
                     par.correctDeleteBalance();
                 }
             }
@@ -422,6 +482,7 @@ public class AVLTree extends BSTree {
         }
     }
 
+    @Override
     public AVLTree Find(int key, boolean exact) {
         AVLTree v = getSentinel();
         // If the right child of sentinel is null then the tree is empty
@@ -445,6 +506,7 @@ public class AVLTree extends BSTree {
         }
     }
 
+    @Override
     public AVLTree getFirst() {
         AVLTree v = getSentinel();
         // If the right child of sentinel is null then the tree is empty
@@ -461,6 +523,7 @@ public class AVLTree extends BSTree {
         }
     }
 
+    @Override
     public AVLTree getNext() {
         // if the node on which getNext is called is the sentinel node return null
         if (this.parent == null) {
@@ -493,12 +556,17 @@ public class AVLTree extends BSTree {
     // false if the property is not satisfied
     private boolean checkChildParent() {
         if (this.left == null && this.right == null) {
+            // Is vacuously true for leaf node
             return true;
         } else if (this.left != null && this.right == null) {
+            // Check the property for the left child and recursively for the left subtree
             return this.left.parent == this && this.left.checkChildParent();
         } else if (this.left == null && this.right != null) {
+            // Check the property for the right child and recursively for the right subtree
             return this.right.parent == this && this.right.checkChildParent();
         } else {
+            // Check the property for the left and right child and 
+            // recursively for the left and right subtree
             return this.left.parent == this && this.right.parent == this && this.left.checkChildParent()
                     && this.right.checkChildParent();
         }
@@ -513,8 +581,6 @@ public class AVLTree extends BSTree {
         // Since in DFS, we never move along an edge more than once,
         // there must be a cycle in the tree
         if (set.contains(this)) {
-            System.out.println(this.key);
-            System.out.println(prev.key);
             return false;
         }
 
@@ -562,24 +628,32 @@ public class AVLTree extends BSTree {
 
     }
 
+    // This function recursively checks the height balancing propert for the AVL
+    // Tree
+    // Returns true if the tree is height balanced
+    // false if the height balanced property is not satisfied
     private boolean isBalanced() {
         if (this.left == null && this.right == null) {
+            // A leaf is height balanced trivially
             return true;
         } else if (this.left != null && this.right == null) {
-            return Math.abs(height(this.left) - height(this.right)) <= 1 && this.left.isBalanced();
+            // Check balance for this node and recursively for the left subtree
+            return Math.abs(getHeight(this.left) - getHeight(this.right)) <= 1 && this.left.isBalanced();
         } else if (this.left == null && this.right != null) {
-            return Math.abs(height(this.left) - height(this.right)) <= 1 && this.right.isBalanced();
+            // Check balance for this node and recursively for the right subtree
+            return Math.abs(getHeight(this.left) - getHeight(this.right)) <= 1 && this.right.isBalanced();
         } else {
-            return Math.abs(height(this.left) - height(this.right)) <= 1 && this.left.isBalanced()
+            // Check balance for this node and recursively for the left and right subtree
+            return Math.abs(getHeight(this.left) - getHeight(this.right)) <= 1 && this.left.isBalanced()
                     && this.right.isBalanced();
         }
     }
 
+    @Override
     public boolean sanity() {
         // Check for cycles in the tree
         HashSet<AVLTree> set = new HashSet<>();
         if (!this.checkCycle(null, set)) {
-            System.out.println("x");
             return false;
         }
 
