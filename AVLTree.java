@@ -486,7 +486,7 @@ public class AVLTree extends BSTree {
         }
     }
 
-    // This function recursively checks whether node.child.parent==node
+    // This function recursively checks whether node.child.parent == node
     // Returns true is the property is satisfied and
     // false if the property is not satisfied
     private boolean checkChildParent() {
@@ -500,7 +500,7 @@ public class AVLTree extends BSTree {
             // Check the property for the right child and recursively for the right subtree
             return this.right.parent == this && this.right.checkChildParent();
         } else {
-            // Check the property for the left and right child and 
+            // Check the property for the left and right child and
             // recursively for the left and right subtree
             return this.left.parent == this && this.right.parent == this && this.left.checkChildParent()
                     && this.right.checkChildParent();
@@ -584,6 +584,19 @@ public class AVLTree extends BSTree {
         }
     }
 
+    // This function recursively checks whether
+    // height == 1 + Max(left.height, right.height)
+    // Returns true is the property is satisfied and
+    // false if the property is not satisfied
+    private boolean checkHeights(AVLTree node) {
+        // The property is vacuously true
+        if (node == null)
+            return true;
+        // Check property for this node and recursively for its children
+        return (node.height == 1 + Math.max(getHeight(this.left), getHeight(this.right))) && checkHeights(this.left)
+                && checkHeights(this.right);
+    }
+
     @Override
     public boolean sanity() {
         // Check for cycles in the tree
@@ -611,6 +624,10 @@ public class AVLTree extends BSTree {
 
         // Check AVL Property for the tree, i.e. if the Tree is height balanced
         if (sent.right != null && !sent.right.isBalanced())
+            return false;
+
+        // Check that height == 1 + Max(left.height, right.height)
+        if (sent.right != null && checkHeights(sent.right))
             return false;
 
         return true;
