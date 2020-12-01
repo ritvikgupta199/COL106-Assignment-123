@@ -224,71 +224,6 @@ public class AVLTree extends BSTree {
         child.right = par;
     }
 
-    // Checks the AVL Balancing Property after Insertion and
-    // Corrects it using suitable rotations
-    private void correctInsertBalance() {
-        AVLTree par = this.parent;
-        AVLTree child = this;
-        // We move up the tree until par becomes the sentinel node
-        while (par.parent != null) {
-            int bal = getHeight(par.left) - getHeight(par.right);
-            if (bal > 1) {
-                // If the left height differs the right height by more than 1,
-                // the balance property is violated
-                // Also the left node is causing the imbalance
-                if (getHeight(child.left) > getHeight(child.right)) {
-                    // If the left child of the child has more height,
-                    // We require a Right Rotation on nodes child and par
-                    rotateR(child, par);
-                    par.updateHeight();
-                    child.updateHeight();
-                    par = child;
-                } else {
-                    // If the right child of the child has more height,
-                    // We first require a Left Rotation on nodes grandchild and child
-                    // followed by a Right Rotation on nodes grandchild and par
-                    AVLTree grandchild = child.right;
-                    rotateL(grandchild, child);
-                    rotateR(grandchild, par);
-                    child.updateHeight();
-                    par.updateHeight();
-                    grandchild.updateHeight();
-                    par = grandchild;
-                }
-            } else if (bal < -1) {
-                // If the right height differs the left height by more than 1,
-                // the balance property is violated
-                // Also the right node is causing the imbalance
-                if (getHeight(child.left) > getHeight(child.right)) {
-                    // If the left child of the child has more height,
-                    // We first require a Right Rotation on nodes grandchild and child
-                    // followed by a Left Rotation on nodes grandchild and par
-                    AVLTree grandchild = child.left;
-                    rotateR(grandchild, child);
-                    rotateL(grandchild, par);
-                    child.updateHeight();
-                    par.updateHeight();
-                    grandchild.updateHeight();
-                    par = grandchild;
-                } else {
-                    // If the right child of the child has more height,
-                    // We require a Left Rotation on nodes child and par
-                    rotateL(child, par);
-                    par.updateHeight();
-                    child.updateHeight();
-                    par = child;
-                }
-            } else {
-                // If the balance is maintained, we just update the height of par node and
-                // continue up the tree
-                par.updateHeight();
-            }
-            child = par;
-            par = par.parent;
-        }
-
-    }
-
     @Override
     public AVLTree Insert(int address, int size, int key) {
         AVLTree v = getSentinel();
@@ -306,15 +241,15 @@ public class AVLTree extends BSTree {
             AVLTree node = new AVLTree(address, size, key);
             // Recursively insert the element from the root node
             insertNode(v.right, node);
-            // Update the height of this node
-            node.updateHeight();
             // Start correcting balance from this node
-            node.correctInsertBalance();
+            node.correctBalance();
             return node;
         }
     }
 
-    private void correctDeleteBalance() {
+    // Checks the AVL Balancing Property and
+    // Corrects it using suitable rotations
+    private void correctBalance() {
         AVLTree par = this;
         par.updateHeight();
         // We move up the tree until par becomes the sentinel node
@@ -407,7 +342,7 @@ public class AVLTree extends BSTree {
                     par.right = null;
                 }
                 // Start correcting balance from this node
-                par.correctDeleteBalance();
+                par.correctBalance();
             } else if (node.left == null && node.right != null) {
                 // If the node only has a right child
                 AVLTree par = node.parent;
@@ -421,7 +356,7 @@ public class AVLTree extends BSTree {
                     node.right.parent = par;
                 }
                 // Start correcting balance from this node
-                par.correctDeleteBalance();
+                par.correctBalance();
             } else if (node.left != null && node.right == null) {
                 // If the node only has a left child
                 AVLTree par = node.parent;
@@ -435,7 +370,7 @@ public class AVLTree extends BSTree {
                     node.left.parent = par;
                 }
                 // Start correcting balance from this node
-                par.correctDeleteBalance();
+                par.correctBalance();
             } else {
                 // If the node has both right and left child, we then copy the successor data
                 // into node and delete the successor node
@@ -461,7 +396,7 @@ public class AVLTree extends BSTree {
                         par.right = null;
                     }
                     // Start correcting balance from this node
-                    par.correctDeleteBalance();
+                    par.correctBalance();
                 } else {
                     // If the right child is not null, i.e. succ has only one child
                     AVLTree par = succ.parent;
@@ -475,7 +410,7 @@ public class AVLTree extends BSTree {
                         succ.right.parent = par;
                     }
                     // Start correcting balance from this node
-                    par.correctDeleteBalance();
+                    par.correctBalance();
                 }
             }
             return true;
